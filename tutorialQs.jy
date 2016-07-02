@@ -1,0 +1,386 @@
+#Week 3
+
+#Write a function that asks the user to enter their name, age (years), height (meters) and weight (kilograms)
+#and then display a customised message using a single print statement. For example, if the user entered "Alan"
+#as their name, 56 as their age, 1.92 as their height and 80 as their weight, the message should display "Hello,
+#Alan! I see that you are 56 years old, 1.92 meters tall and weigh 80.0 kgs." You must use the appropriate
+#function based on the type of input that you take.
+
+def userDetails():
+  userName = requestString("What is your name?")
+  userAge = str(requestInteger("How old are you?"))
+  userHeight = str(requestNumber("How tall are you?"))
+  userWeight = str(requestNumber("What is your weight?"))
+  message = "Hello, " + userName + "! I see that you are " + userAge + " years old, " + userHeight + " meters tall and weigh " + userWeight + " kgs."
+  print message
+
+#What constructs do we need to implement simple rule-checking/conditional behaviours in a (JES) program? How
+#could we write a simple JES function that asks the user to enter a number between 0 and 9 then print out the
+#corresponding English word (e.g. 0 is "zero", 1 is "one", etc.)?
+
+def numberToWord():
+  userNumber = requestInteger("Please enter a number between 0 and 9")
+  if userNumber == 0:
+    print "zero"
+  elif userNumber == 1:
+    print "one"
+  elif userNumber == 2:
+    print "two"
+  elif userNumber == 3:
+    print "three"
+  elif userNumber == 4:
+    print "four"
+  elif userNumber == 5:
+    print "five"
+  elif userNumber == 6:
+    print "six"
+  elif userNumber == 7:
+    print "seven"
+  elif userNumber == 8:
+    print "eight"
+  elif userNumber == 9:
+    print "nine"
+
+#(Optional) How can we extend the behaviour so that it can be repeated for a predetermined number of inputs?
+
+def numberToWord2(userNumber):
+  if userNumber == 0:
+    print "zero"
+  elif userNumber == 1:
+    print "one"
+  elif userNumber == 2:
+    print "two"
+  elif userNumber == 3:
+    print "three"
+  elif userNumber == 4:
+    print "four"
+  elif userNumber == 5:
+    print "five"
+  elif userNumber == 6:
+    print "six"
+  elif userNumber == 7:
+    print "seven"
+  elif userNumber == 8:
+    print "eight"
+  elif userNumber == 9:
+    print "nine"
+
+
+#Week 4
+
+#Extend the function shown in the week 3 task 3 solution so that it calculates the users' body mass index (BMI)
+#and then displays a message classifying their BMI value. The BMI is calculated as bmi=weight/(height*height).
+
+def userDetails():
+  userName = requestString("What is your name?")
+  userAge = str(requestInteger("How old are you?"))
+  userHeight = requestNumber("How tall are you?")
+  userWeight = requestNumber("What is your weight?")
+  userBMI = userWeight/(userHeight*userHeight)
+  if userBMI >= 40:
+    BMIMessage = "You are very severely obese."
+  elif userBMI >= 35:
+    BMIMessage = "You are severely obese."
+  elif userBMI >= 30:
+    BMIMessage = "You are moderately obese."
+  elif userBMI >= 25:
+    BMIMessage = "You are overweight."
+  elif userBMI >= 18.5:
+    BMIMessage = "Your weight is normal."
+  elif userBMI >= 16:
+    BMIMessage = "You are underweight."
+  elif userBMI >= 15:
+    BMIMessage = "You are severely underweight."
+  elif userBMI < 15:
+    BMIMessage = "You are very severely underweight."
+  message = "Hello, " + userName + "! I see that you are " + userAge + " years old, " + str(userHeight) + " meters tall and weigh " + str(userWeight) + " kgs. " + BMIMessage
+  print message
+
+
+#Week 5
+
+#Implement the user input validation using while loops.
+
+def inputValidator():
+  userInput = requestInteger("Enter a number between 0 and 9.")
+  while (userInput < 0 or userInput > 9):
+    userInput = requestInteger("Error! Inputs must be between 0 and 9. Please re-enter.")
+  print "You have entered", userInput
+
+
+#Week 6
+
+#During the week 6 compulsory tutorial (where the solutions for week 5 were demonstrated), Gayan
+#showed how while loops can be used to ensure that all entered inputs are valid.
+#In this task, incorporate input validation using while loops (in the style that has been shown in the
+#tutorials) to validate any inputs used for question 4.6 above. Some requirements to keep in mind:
+#1. Only while loops must be used for validation.
+#2. An error message should be shown when the user is asked to re-enter.
+#3. break statements must not be used (ask Gayan why).
+
+def testModScaleDown():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  scaledDownPic = modScaleDown(picture)
+  explore(scaledDownPic)
+
+def modScaleDown(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+
+  #validate inputs
+  leftX = requestInteger("Please select a starting x coordinate.")
+  while (leftX < 0 or leftX > width):
+    leftX = requestInteger("That coordinate is not within the picture. Please select a new starting x coordinate.")
+  topY = requestInteger("Please select a starting y coordinate.")
+  while (topY < 0 or topY > height):
+    topY = requestInteger("That coordinate is not within the picture. Please select a new starting y coordinate.")
+  rightX = requestInteger("Please select an ending x coordinate.")
+  while (rightX <= leftX or rightX > width):
+    if (rightX <= leftX):
+      rightX = requestInteger("Please select an ending x coordinate that is greater than the starting x coordinate.")
+    else:
+      rightX = requestInteger("That coordinate is not within the picture. Please select a new ending x coordinate.")
+  bottomY = requestInteger("Please select an ending y coordinate.")
+  while (bottomY <= topY or bottomY > height):
+    if (bottomY <= topY):
+      bottomY = requestInteger("Please select an ending y coordinate that is greater than the starting y coordinate.")
+    else:
+      bottomY = requestInteger("That coordinate is not within the picture. Please select a new ending y coordinate.")
+  scaledDownPic = makeEmptyPicture(width, height)
+
+  #copy the image
+  for x in range(0, width):
+    for y in range(0, height):
+      originalPixel = getPixel(picture, x, y)
+      newPixel = getPixel(scaledDownPic, x , y)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+
+  #scale down selected area and copy over new image
+  sourceWidth = rightX - leftX
+  sourceHeight = bottomY - topY
+  targetXStart = leftX + (sourceWidth / 4)
+  targetYStart = topY + (sourceWidth / 4)
+  targetXEnd = targetXStart + (sourceWidth * 0.5)
+  targetYEnd = float(targetYStart) + (sourceHeight * 0.5)
+  sourceX = float(targetXStart)
+  for x in range(targetXStart, int(targetXEnd)):
+    sourceY = float(targetYStart)
+    for y in range(targetYStart, int(targetYEnd)):
+      origPixel = getPixel(picture, int(sourceX), int(sourceY))
+      newPixel = getPixel(scaledDownPic, x, y)
+      colour = getColor(origPixel)
+      setColor(newPixel, colour)
+      sourceY = sourceY + 2
+    sourceX = sourceX + 2
+  return scaledDownPic
+
+
+#Week 7
+
+#You have used 'while' loops since week 5. Now modify some or all of the loops that you wrote for functions
+#in task 2 to use 'while' loops. Note: You must not write “while true” style loops or use the “break” statement.
+
+#4.10 & 4.11 modified:
+def testModScaleDown():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  scaledPic = modScalePicture(picture, 50)
+  explore(scaledPic)
+
+def modScalePicture(picture, percentage):
+  #calculate dimensions
+  width = getWidth(picture)
+  height = getHeight(picture)
+  scaleWidth = int(width * percentage / 100)
+  scaleHeight = int(height * percentage / 100)
+  increment = 100.0 / percentage
+  scaledPic = makeEmptyPicture(scaleWidth, scaleHeight)
+  #show(scaledPic)
+  #copy into new image
+  sourceX = 0
+  x = 0
+  while (x < scaleWidth):
+    sourceY = 0
+    y = 0
+    while (y < scaleHeight):
+      #repaint(scaledPic)
+      origPixel = getPixel(picture, int(sourceX), int(sourceY))
+      newPixel = getPixel(scaledPic, x, y)
+      colour = getColor(origPixel)
+      setColor(newPixel, colour)
+      sourceY = sourceY + increment
+      y = y + 1
+    sourceX = sourceX + increment
+    x = x + 1
+  return scaledPic
+
+#4.12 modified:
+def testModDecreaseRed():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  modDecreaseRed(picture)
+  explore(picture)
+
+def modDecreaseRed(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  x = 0
+  while (x < width):
+    y = 0
+    while (y < height):
+      p = getPixel(picture, x, y)
+      value=getRed(p)
+      setRed(p,value*0.5)
+      y = y + 1
+    x = x + 1
+
+#4.15 modified:
+def testModChangeColours():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  modChangeColours(picture)
+  explore(picture)
+
+def modChangeColours(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  #reduce red
+  x = 0
+  while (x < width):
+    y = 0
+    while (y < (height / 3)):
+      pixel = getPixel(picture, x, y)
+      redValue = getRed(pixel)
+      setRed(pixel, (redValue - 25))
+      y = y + 1
+    x = x + 1
+  #clear blue
+  x = 0
+  while (x < width):
+    y = height / 3 * 2
+    while (y < height):
+      pixel = getPixel(picture, x, y)
+      setBlue(pixel, 0)
+      y = y + 1
+    x = x + 1
+
+
+#Week 8
+
+#You have used 'while' loops since week 5. During this week and next week, you will develop a function
+#that allows users to add various shapes to a picture object based on their inputs.
+#1. Create an empty picture object (using makeEmptyPicture) called 'canvas' and display it. The user must
+#be allowed to enter a valid width and a height for 'canvas' using the requestInteger function (do not use
+#requestIntegerInRange). If any input is invalid, the user must be immediately asked (i.e. without taking
+#further inputs) to re-enter only that invalid input. You must proceed only when the user enters valid
+#inputs.
+#2. Allow the user to add a filled rectangle (using addRectFilled). The x1, y1, width and height for the
+#rectangle must be taken as separate validated inputs.
+#3. Now allow the user to enter a colour for the rectangle by entering 0 for red, 1 for green and 2 for blue.
+#This input must also be validated.
+#4. Now ask the user if they wish to enter another rectangle (0 for no, 1 for yes) and repeat the rectangle
+#adding process. You must use while loops and avoid using 'while true' loops and 'break' or 'return' to stop
+#the loop.
+
+def task3():
+  #Create the picture object
+  picWidth = requestInteger("Please enter a width for the picture.")
+  while (picWidth <= 0):
+    picWidth = requestInteger("The picture cannot be that small. Please enter a width for the picture.")
+  picHeight = requestInteger("Please enter a height for the picture.")
+  while (picHeight <= 0):
+    picHeight = requestInteger("The picture cannot be that small. Please enter a height for the picture.")
+  canvas = makeEmptyPicture(picWidth, picHeight)
+
+  #Start drawing on the canvas
+  keepDrawing = 1
+  while keepDrawing == 1:
+    #Get coordinates for the rectangle
+    x1 = requestInteger("How far across would you like to begin drawing?")
+    while (x1 < 0 or x1 >= picWidth):
+      x1 = requestInteger("That position is not on the canvas. How far across would you like to begin drawing?")
+    y1 = requestInteger("How far down would you like to begin drawing?")
+    while (y1 < 0 or y1 >= picHeight):
+      y1 = requestInteger("That position is not on the canvas. How far down would you like to begin drawing?")
+    shapeWidth = requestInteger("How wide would you like the rectangle to be?")
+    while ((shapeWidth + x1) >= picWidth):
+      shapeWidth = requestInteger("That rectangle will not fit on the canvas. How wide would you like the rectangle to be?")
+    shapeHeight = requestInteger("How tall would you like the rectangle to be?")
+    while ((shapeHeight + y1) >= picHeight):
+      shapeHeight = requestInteger("That rectangle will not fit on the canvas. How tall would you like the rectangle to be?")
+
+    #Get colour for the rectangle
+    askColour = requestInteger("What colour would you like the rectangle to be? Please enter 0 for red, 1 for green or 2 for blue")
+    while (askColour > 2):
+      askColour = requestInteger("That colour is not an option. What colour would you like the rectangle to be? Please enter 0 for red, 1 for green or 2 for blue")
+    if askColour == 0:
+      shapeColour = red
+    if askColour == 1:
+      shapeColour = green
+    if askColour == 2:
+      shapeColour = blue
+
+    #Draw and display
+    addRectFilled(canvas, x1, y1, shapeWidth, shapeHeight, shapeColour)
+    repaint(canvas)
+    keepDrawing = requestInteger("Would you like to enter another rectangle? Please enter 1 for yes or 0 for no.")
+    while keepDrawing < 0 or keepDrawing > 1:
+      keepDrawing = requestInteger("Would you like to enter another rectangle? Please enter 1 for yes or 0 for no.")
+  return canvas
+
+
+#Week 9
+
+#Extend your function from task 3 last week (watch Gayan's solution if you were not able to complete it)
+#as follows:
+#1. Now allow the user to choose whether to add either a filled rectangle or filled oval (addOvalFilled).
+#All inputs must be validated using the previously given restrictions.
+#2. Put some of the repeating code in to reusable functions and use them within the main drawing
+#functions.
+#3. You have seen how lists and arrays can be used from Gayan's solution to 5.3. Modify your task 3
+#function so that the colours are now stored in an array/list and more colours are available to choose from.
+
+def validateNumber(minimum, maximum, message):
+  question = requestInteger(message)
+  if maximum == false:
+    while (question < minimum):
+      question = requestInteger("That is not a valid option. " + message)
+  else:
+    while (question < minimum or maximum < question):
+      question = requestInteger("That is not a valid option. " + message)
+  return question
+
+def task3():
+  #Create the picture object
+  picWidth = validateNumber(1, false, "Please enter a width for the picture.")
+  picHeight = validateNumber(1, false, "Please enter a height for the picture.")
+  canvas = makeEmptyPicture(picWidth, picHeight)
+
+  #Start drawing on the canvas
+  keepDrawing = validateNumber(0, 2, "What would you like to draw? Enter 1 for a rectangle or 2 for an oval. Enter 0 to stop drawing.")
+  while keepDrawing == 1 or keepDrawing == 2:
+    #Get coordinates for the rectangle
+    x1 = validateNumber(0, (picWidth - 1), "How far across would you like to begin drawing?")
+    y1 = validateNumber(0, (picHeight - 1), "How far down would you like to begin drawing?")
+    shapeWidth = validateNumber(1, (picWidth - 1 - x1), "How wide would you like the shape to be?")
+    shapeHeight = validateNumber(1, (picHeight - 1 - y1), "How tall would you like the shape to be?")
+
+    #Get colour for the shape
+    availableColours = [black, white, red, green, blue, gray, darkGray, lightGray, yellow, orange, pink, magenta, cyan]
+    askColour = validateNumber(0, 12, "What colour would you like the shape to be? Black = 0. White = 1. Red = 2. Green = 3. Blue = 4. Gray = 5. Dark gray = 6. Light gray = 7. Yellow = 8. Orange = 9. Pink = 10. Magenta = 11. Cyan = 12.")
+    shapeColour = availableColours[askColour]
+
+    #Draw and display
+    if keepDrawing == 1:
+      addRectFilled(canvas, x1, y1, shapeWidth, shapeHeight, shapeColour)
+    elif keepDrawing == 2:
+      addOvalFilled(canvas, x1, y1, shapeWidth, shapeHeight, shapeColour)
+    repaint(canvas)
+    keepDrawing = validateNumber(0, 2, "What would you like to draw? Enter 1 for a rectangle or 2 for an oval. Enter 0 to stop drawing.")
+  return canvas
