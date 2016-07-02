@@ -1,0 +1,42 @@
+#Q 3.2: Program 9 (page 80) obviously reduces the red by too much. Write a version that only
+#reduces the red by 10%, then one by 20%.
+
+def decreaseRedBy10PerCent(picture):
+  for pixel in getPixels(picture):
+    value = getRed(pixel)
+    setRed(pixel, value * 0.9)
+
+def decreaseRedBy20PerCent(picture):
+  for pixel in getPixels(picture):
+    value = getRed(pixel)
+    setRed(pixel, value * 0.8)
+
+
+#Q 3.6: Write a function to set the red value of each pixel to the average of the blue and green values in the pixel.
+
+def setRedToAverage(picture):
+  for pixel in getPixels(picture):
+    greenComponent = getGreen(pixel)
+    blueComponent = getBlue(pixel)
+    blueGreenAverage = (greenComponent + blueComponent) / 2
+    newRed = int(blueGreenAverage)
+    setRed(pixel, newRed)
+
+
+#Q 3.16: Write a function to change a picture to grayscale and then negate it.
+
+def testGrayscale():
+  file = pickAFile()
+  picture = makePicture(file)
+  grayscaleThenNegate(picture)
+  explore(picture)
+
+def grayscaleThenNegate(picture):
+  for pixel in getPixels(picture):
+    red = getRed(pixel)
+    green = getGreen(pixel)
+    blue = getBlue(pixel)
+    intensity = (red + green + blue) / 3
+    negatedIntensity = 255 - intensity
+    finalColor = makeColor(negatedIntensity, negatedIntensity, negatedIntensity)
+    setColor(pixel, finalColor)
