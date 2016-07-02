@@ -1,0 +1,322 @@
+#4.3 Write a function to mirror along the diagonal from (0, 0) to (width, height).
+
+def testmirrorOnDiagonal():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  mirrorOnDiagonal(picture)
+  explore(picture)
+
+def mirrorOnDiagonal(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  #Stop the loops before it runs out of image to copy into on a portrait orientation.
+  if height > width:
+    height = width
+  mirrorPoint = 0
+  for y in range(0, height):
+    for x in range(0, mirrorPoint):
+      originalPixel = getPixel(picture, x, y)
+      changedPixel = getPixel(picture, y, x)
+      colour = getColor(originalPixel)
+      setColor(changedPixel, colour)
+    mirrorPoint = mirrorPoint + 1
+
+
+#4.4 Write a function to mirror along the diagonal from (0, height) to (width, 0).
+
+def testmirrorOnDiagonal2():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  mirrorOnDiagonal2(picture)
+  explore(picture)
+
+def mirrorOnDiagonal2(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  #Stop the loops before it runs out of image to copy into on a landscape orientation.
+  if width > height:
+    width = height
+    endPoint = height
+  else:
+    endPoint = width
+  mirrorPoint = endPoint
+  for x in range(0, width):
+    for y in range(0, mirrorPoint):
+      originalPixel = getPixel(picture, x, y)
+      changedPixel = getPixel(picture, (endPoint - y - 1) , (endPoint - x - 1))
+      colour = getColor(originalPixel)
+      setColor(changedPixel, colour)
+    mirrorPoint = mirrorPoint - 1
+
+
+#4.5: Write a function that will scale up just part of the picture. Try making someone's nose longer.
+
+def testpartialScaleUp():
+  #Please select the mediasources folder in the next dialogue.
+  setMediaPath()
+  file = getMediaPath("barbara.jpg")
+  #These are the coordinates for Barbara's nose.
+  topY = 130
+  bottomY = 145
+  leftX = 116
+  rightX = 142
+  picture = makePicture(file)
+  #explore(picture)
+  modifiedPicture = enlargeNose(picture, topY, bottomY, leftX, rightX)
+  explore(modifiedPicture)
+
+def enlargeNose(picture, topY, bottomY, leftX, rightX):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  scaledPicture = makeEmptyPicture(width, height)
+
+  #copy the original picture into the empty picture
+  newX = 0
+  for x in range(0, width):
+    newY = 0
+    for y in range(0, height):
+      origPixel = getPixel(picture, x, y)
+      newPixel = getPixel(scaledPicture, newX, newY)
+      colour = getColor(origPixel)
+      setColor(newPixel, colour)
+      newY = newY + 1
+    newX = newX + 1
+
+  #scale the target area
+  sourceWidth = rightX - leftX
+  sourceHeight = bottomY - topY
+  targetXStart = leftX - (sourceWidth / 4)
+  targetXEnd = targetXStart + (sourceWidth * 1.75)
+  targetYEnd = float(topY) + (sourceHeight * 1.75)
+  sourceX = float(targetXStart)
+  #Offset the start point so that the nose remains even with the face.
+  for x in range(targetXStart, int(targetXEnd)):
+    sourceY = float(topY)
+    for y in range(topY, int(targetYEnd)):
+      origPixel = getPixel(picture, int(sourceX), int(sourceY))
+      newPixel = getPixel(scaledPicture, x, y)
+      colour = getColor(origPixel)
+      setColor(newPixel, colour)
+      sourceY = sourceY + 0.75
+    sourceX = sourceX + 0.75
+
+  return scaledPicture
+
+
+#4.6 Write a function that will scale down just a part of the picture. Make someone's head look smaller.
+
+def testScaleDown():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  leftX = requestInteger("Please select a starting x coordinate.")
+  topY = requestInteger("Please select a starting y coordinate.")
+  rightX = requestInteger("Please select an ending x coordinate.")
+  bottomY = requestInteger("Please select an ending y coordinate.")
+  scaledDownPic = scaleDown(picture, leftX, topY, rightX, bottomY)
+  explore(scaledDownPic)
+
+def scaleDown(picture, leftX, topY, rightX, bottomY):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  scaledDownPic = makeEmptyPicture(width, height)
+
+  #copy the image
+  for x in range(0, width):
+    for y in range(0, height):
+      originalPixel = getPixel(picture, x, y)
+      newPixel = getPixel(scaledDownPic, x , y)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+
+  #scale down selected area and copy over new image
+  sourceWidth = rightX - leftX
+  sourceHeight = bottomY - topY
+  targetXStart = leftX + (sourceWidth / 4)
+  targetYStart = topY + (sourceWidth / 4)
+  targetXEnd = targetXStart + (sourceWidth * 0.5)
+  targetYEnd = float(targetYStart) + (sourceHeight * 0.5)
+  sourceX = float(targetXStart)
+  for x in range(targetXStart, int(targetXEnd)):
+    sourceY = float(targetYStart)
+    for y in range(targetYStart, int(targetYEnd)):
+      origPixel = getPixel(picture, int(sourceX), int(sourceY))
+      newPixel = getPixel(scaledDownPic, x, y)
+      colour = getColor(origPixel)
+      setColor(newPixel, colour)
+      sourceY = sourceY + 2
+    sourceX = sourceX + 2
+  return scaledDownPic
+
+
+#4.7 Write a function to flip a picture over so that if someone was looking right, they end up looking left.
+
+def testFlipHorizontal():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  flippedPicture = flipHorizontal(picture)
+  explore(flippedPicture)
+
+def flipHorizontal(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  flippedPicture = makeEmptyPicture(width, height)
+  for x in range(0, width):
+    for y in range(0, height):
+      originalPixel = getPixel(picture, x, y)
+      newPixel = getPixel(flippedPicture, (width - x -1) , y)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+  return flippedPicture
+
+
+#4.8: Write a general crop function that takes a source picture, the start X value, the start Y value,
+#the end x value, and the end y value. Create and return the new picture and copy just the specified
+#area into the new picture.
+
+def testcropPicture():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  startX = requestInteger("How far across would you like to crop from?")
+  startY = requestInteger("How high would you like to crop from?")
+  endX = requestInteger("How far across would you like to crop to?")
+  endY = requestInteger("How far down would you like to crop to?")
+  croppedPicture = cropPicture(picture, startX, startY, endX, endY)
+  explore(croppedPicture)
+
+def cropPicture(picture, startX, startY, endX, endY):
+  newHeight = endY - startY + 1
+  newWidth = endX - startX + 1
+  croppedPicture = makeEmptyPicture(newWidth, newHeight)
+  newX = 0
+  for x in range(startX, endX + 1):
+    newY = 0
+    for y in range(startY, endY + 1):
+      origPixel = getPixel(picture, x, y)
+      newPixel = getPixel(croppedPicture, newX, newY)
+      colour = getColor(origPixel)
+      setColor(newPixel, colour)
+      newY = newY + 1
+    newX = newX + 1
+  return croppedPicture
+
+
+#4.9 Write a function that copies different parts of a picture to different places in the target.
+
+def testPartCopy():
+  file1 = pickAFile()
+  picture1 = makePicture(file1)
+  file2 = pickAFile()
+  picture2 = makePicture(file2)
+  explore(picture1)
+  leftX = requestInteger("Please select a starting x coordinate.")
+  topY = requestInteger("Please select a starting y coordinate.")
+  rightX = requestInteger("Please select an ending x coordinate.")
+  bottomY = requestInteger("Please select an ending y coordinate.")
+  toX = requestInteger("Please select a destination x coordinate.")
+  toY = requestInteger("Please select a destination y coordinate.")
+  partCopy(picture1, picture2, leftX, topY, rightX, bottomY, toX, toY)
+  explore(picture2)
+
+def partCopy(picFrom, picTo, leftX, topY, rightX, bottomY, toX, toY):
+  destinationX = toX
+  for x in range(leftX, rightX):
+    destinationY = toY
+    for y in range(topY, bottomY):
+      fromPixel = getPixel(picFrom, x, y)
+      toPixel = getPixel(picTo, destinationX , destinationY)
+      colour = getColor(fromPixel)
+      setColor(toPixel, colour)
+      destinationY = destinationY + 1
+    destinationX = destinationX + 1
+
+
+#4.10: Write a general scaleUp function that takes in a picture and creates and returns a new picture twice as big using makeEmptyPicture(width, height).
+#4.11: Write a general scaleDown function that takes in a picture and creates and returns a new picture half as big using makeEmptyPicture(width, height).
+
+def scaleUp():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  scaledPic = scalePicture(picture, 200)
+  explore(scaledPic)
+
+def scaleDown():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  scaledPic = scalePicture(picture, 50)
+  explore(scaledPic)
+
+def scalePicture(picture, percentage):
+  #calculate dimensions
+  width = getWidth(picture)
+  height = getHeight(picture)
+  scaleWidth = int(width * percentage / 100)
+  scaleHeight = int(height * percentage / 100)
+  increment = 100.0 / percentage
+  scaledPic = makeEmptyPicture(scaleWidth, scaleHeight)
+  #show(scaledPic)
+  #copy into new image
+  sourceX = 0
+  for x in range(0, scaleWidth):
+    sourceY = 0
+    for y in range(0, scaleHeight):
+      #repaint(scaledPic)
+      origPixel = getPixel(picture, int(sourceX), int(sourceY))
+      newPixel = getPixel(scaledPic, x, y)
+      colour = getColor(origPixel)
+      setColor(newPixel, colour)
+      sourceY = sourceY + increment
+    sourceX = sourceX + increment
+  return scaledPic
+
+
+#4.12: Modify any of the functions from the last chapter to use a nested loop. Check the result to make sure it still does the same thing.
+
+#I have chosen Program 9: Reduce the Amount of Red in a Picture by 50%
+
+def testDecreaseRed():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  decreaseRed(picture)
+  explore(picture)
+
+def decreaseRed(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  for x in range(0, width):
+    for y in range(0, height):
+      p = getPixel(picture, x, y)
+      value=getRed(p)
+      setRed(p,value*0.5)
+
+
+#4.15: Write a function that reduces red in the top third of a picture and clears blue in the bottom third.
+
+def testChangeColours():
+  file = pickAFile()
+  picture = makePicture(file)
+  explore(picture)
+  changeColours(picture)
+  explore(picture)
+
+def changeColours(picture):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  #reduce red
+  for x in range(0, width):
+    for y in range(0, (height / 3)):
+      pixel = getPixel(picture, x, y)
+      redValue = getRed(pixel)
+      setRed(pixel, (redValue - 25))
+  #clear blue
+  for x in range(0, width):
+    for y in range((height / 3 * 2), height):
+      pixel = getPixel(picture, x, y)
+      setBlue(pixel, 0)
