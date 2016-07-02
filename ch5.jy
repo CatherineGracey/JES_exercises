@@ -1,0 +1,459 @@
+#Q 5.1: Write a function called changeColor that takes as input a picture and an amount to increase or decrease
+#a color by and a number 1 (for red), 2 (for green), or 3 (for blue). The amount will be a number between -.99 and .99.
+# changeColor(pict,-.10,1) should decrease the amount of red in the picture by 10%.
+# changeColor(pict,.30,2) should increase the amount of green in the picture by 30%.
+# changeColor(pict,0,3) should do nothing at all to the amount of blue (or red or green) in the picture.
+#For 5.1, use only 'while' loops. Do not use 'while true' style loops. Do not use 'break' or 'return' to
+#terminate the loops. If you do not know how to do this, please watch Gayan's tutorial solutions for weeks
+#5, 6, 7, etc.
+
+def testChangeColor():
+  picture = makePicture(pickAFile())
+  amount = requestNumber("How much would you like to change the colour by?")
+  colour = requestInteger("Which colour would you like to change? Please enter 1 for red, 2 for green, or 3 for blue")
+  explore(picture)
+  changeColor(picture, amount, colour)
+  explore(picture)
+
+def changeColor(picture, amount, colour):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  x = 0
+  change = 1 + amount
+  while (x < width):
+    y = 0
+    while (y < height):
+      pixel = getPixel(picture, x, y)
+      if colour == 1:
+        value = getRed(pixel)
+        setRed(pixel, value * change)
+      if colour == 2:
+        value = getGreen(pixel)
+        setGreen(pixel, value * change)
+      if colour == 3:
+        value = getBlue(pixel)
+        setBlue(pixel, value * change)
+      y = y + 1
+    x = x + 1
+
+
+#Q 5.3
+#Rewrite Program 40 using this helper function to make it much shorter.
+
+def testModPosterize():
+  picture = makePicture(pickAFile())
+  explore(picture)
+  modPosterize(picture)
+  explore(picture)
+
+def pickPosterizeValue(current):
+  if (current < 64):
+    return 31
+  if (current > 63 and current < 128):
+    return 95
+  if (current > 127 and current < 192):
+    return 159
+  if (current > 191 and current < 256):
+    return 223
+
+def modPosterize(picture):
+  #loop through the pixels
+  for p in getPixels(picture):
+    #get the RGB values
+    red = getRed(p)
+    green = getGreen(p)
+    blue = getBlue(p)
+
+    #check and set red values
+    newRed = pickPosterizeValue(red)
+    setRed(p, newRed)
+
+    #check and set green values
+    newGreen = pickPosterizeValue(green)
+    setGreen(p, newGreen)
+
+    #check and set blue values
+    newBlue = pickPosterizeValue(blue)
+    setBlue(p, newBlue)
+
+
+#Q 5.7: Try doing chromakey in a range - grab something out of its background where the something is only in one part of a picture. For example, put a halo around someone's head but don't mess with the rest of the body.
+
+#Instead of going for the halo around someone's head, I decided to put a lava flow on the mountain behind the beach.
+def lavaMountain():
+  #Please select the mediasources folder in the next dialogue.
+  setMediaPath()
+  beach = makePicture(getMediaPath("beach.jpg"))
+  explore(beach)
+  x = 558
+  while x < 585:
+    y = 155
+    while y < 175:
+      #check colour
+      pixel = getPixel(beach, x, y)
+      r = getRed(pixel)
+      #set if needed
+      if r < 100:
+        setRed(pixel, 250)
+        g = getGreen(pixel)
+        if g > 50:
+          setGreen(pixel, 160)
+      y = y + 1
+    x = x + 1
+  explore(beach)
+  return beach
+
+def haloHead():
+  #Please select the mediasources folder in the next dialogue.
+  setMediaPath()
+  mark = makePicture(getMediaPath("blue-mark.jpg"))
+  haloWidth = 212
+  haloHeight = 212
+  halo = makeEmptyPicture(haloWidth, haloHeight, black)
+  addOvalFilled(halo, 0, 0, haloWidth - 1, haloHeight - 1, yellow)
+  explore(mark)
+  mx = 225
+  hx = 0
+  while hx < haloWidth:
+    my = 104
+    hy = 0
+    while hy < haloHeight:
+      #check if background is blue
+      pixel = getPixel(mark, mx, my)
+      if (getRed(pixel) + getGreen(pixel) < getBlue(pixel)):
+        #check if the halo circle fits in this space
+        haloPixel = getPixel(halo, hx, hy)
+        if (getRed(haloPixel) == 255):
+          setColor(pixel, getColor(haloPixel))
+      my = my + 1
+      hy = hy + 1
+    mx = mx + 1
+    hx = hx + 1
+  explore(mark)
+  return mark
+
+
+#Q 5.11: Write a function to take 25% of one picture blended with 75% of another.
+
+def testBlendPictures():
+  picture1 = makePicture(pickAFile())
+  picture2 = makePicture(pickAFile())
+  picture = blendPictures(picture1, picture2, 50)
+  explore(picture)
+
+def blendPictures(picture1, picture2, overlap):
+  #Get dimensions of original pictures
+  width1 = getWidth(picture1)
+  height1 = getHeight(picture1)
+  width2 = getWidth(picture2)
+  height2 = getHeight(picture2)
+  #Calculate size of new image
+  totalWidth = width1 + width2 - overlap - 1
+  if height1 > height2:
+    totalHeight = height1
+  else:
+    totalHeight = height2
+  newPicture = makeEmptyPicture(totalWidth, totalHeight)
+
+  #Fill unblended section of picture1
+  dx = 0
+  while (dx < width1 - overlap):
+    y = 0
+    while (y < height1):
+      originalPixel = getPixel(picture1, dx, y)
+      newPixel = getPixel(newPicture, dx, y)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+      y = y + 1
+    dx = dx + 1
+  #Fill unblended section of picture2
+
+  dx = width1
+  sx = overlap
+  while (dx < totalWidth):
+    y = 0
+    while (y < height2):
+      originalPixel = getPixel(picture2, sx, y)
+      newPixel = getPixel(newPicture, dx, y)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+      y = y + 1
+    dx = dx + 1
+    sx = sx + 1
+
+  #Fill blended section
+  dx = width1 - overlap
+  sx = 0
+  while (dx < width1):
+    y = 0
+    while (y < totalHeight):
+      #calculate blended colour
+
+      if y < height1 and y < height2:  #both pictures have a pixel
+        #Get colour of picture1
+        originalPixel1 = getPixel(picture1, dx, y)
+        colour1 = getColor(originalPixel1)
+        #Get colour of picture2
+        originalPixel2 = getPixel(picture2, sx, y)
+        colour2 = getColor(originalPixel2)
+        r = 0.25 * getRed(originalPixel1) + 0.75 * getRed(originalPixel2)
+        g = 0.25 * getGreen(originalPixel1) + 0.75 * getGreen(originalPixel2)
+        b = 0.25 * getBlue(originalPixel1) + 0.75 * getBlue(originalPixel2)
+        newColour = makeColor(r, g, b)
+
+      elif y < height1:  #only picture1 has a pixel
+        #Get colour of picture1
+        originalPixel1 = getPixel(picture1, dx, y)
+        newColour = getColor(originalPixel1)
+
+      else:  #only picture2 has a pixel
+        #Get colour of picture2
+        originalPixel2 = getPixel(picture2, sx, y)
+        newColour = getColor(originalPixel2)
+
+      #set blended colour
+      newPixel = getPixel(newPicture, dx, y)
+      setColor(newPixel, newColour)
+      y = y + 1
+    dx = dx + 1
+    sx = sx + 1
+  return newPicture
+
+
+#Q 5.14: Create a comic strip by putting three to four pictures next to each other horizontally and adding text.
+def drawComicStrip():
+  #Please select the mediasources folder in the next dialogue.
+  setMediaPath()
+  caterpillar = makePicture(getMediaPath("caterpillar.jpg"))
+  #explore(caterpillar)
+  garden = makePicture(getMediaPath("garden.jpg"))
+  #explore(garden)
+  butterfly = makePicture(getMediaPath("butterfly2.jpg"))
+  #explore(butterfly)
+  height = getHeight(caterpillar)
+  width = getWidth(caterpillar)
+  comicWidth = width * 3 + 3
+  comicHeight = height + 52
+  picture = makeEmptyPicture(comicWidth, comicHeight, white)
+
+  #cell 1
+  x = 0
+  while x < width:
+    y = 0
+    while y < height:
+      originalPixel = getPixel(caterpillar, x, y)
+      #offset x & y to leave room for the cell borders
+      newPixel = getPixel(picture, x + 1, y + 50)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+      y = y + 1
+    x = x + 1
+  addText(picture, 40, 25, "Sometimes I feel ugly ...", black)
+
+  #cell 2
+  x = 0
+  while x < width:
+    y = 0
+    while y <= height:
+      originalPixel = getPixel(garden, x + 10, y + 100)
+      #offset x & y to leave room for the cell borders
+      newPixel = getPixel(picture, x + width + 2, y + 1)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+      y = y + 1
+    x = x + 1
+  addText(picture, width + 25, height + 30, "... but a bit of comfort food ...", black)
+
+  #cell 3
+  x = 0
+  while x < width:
+    y = 0
+    while y <= comicHeight - 2:
+      originalPixel = getPixel(butterfly, x + 100, y + 100)
+      #offset x & y to leave room for the cell borders
+      newPixel = getPixel(picture, x + width * 2 + 3, y + 1)
+      colour = getColor(originalPixel)
+      setColor(newPixel, colour)
+      y = y + 1
+    x = x + 1
+  addText(picture, width * 2 + 8, 25, "... makes me feel beautiful again", black)
+
+  #Lines around cells
+  addRect(picture, 0, 0, width, comicHeight - 1, black)
+  addRect(picture, width + 1, 0, width, comicHeight - 1, black)
+  addRect(picture, width * 2 + 2, 0, width, comicHeight - 1, black)
+
+  explore(picture)
+  return picture
+
+
+#Q 5.15: Using the drawing function, draw a bull's eye.
+def drawBullsEye(diameter):
+  picture = makeEmptyPicture(diameter, diameter, lightGray)
+  i = diameter / 10
+  addOvalFilled(picture, 0, 0, diameter, diameter, white)
+  addOvalFilled(picture, i, i, diameter - (i * 2), diameter - (i * 2), black)
+  addOvalFilled(picture, i * 2, i * 2, diameter - (i * 4), diameter - (i * 4), cyan)
+  addOvalFilled(picture, i * 3, i * 3, diameter - (i * 6), diameter - (i * 6), red)
+  addOvalFilled(picture, i * 4, i * 4, diameter - (i * 8), diameter - (i * 8), yellow)
+  explore(picture)
+  return picture
+
+
+#Q 5.16: Using the drawing tools presented here, draw a house - just go for the simple child's house with one door, two windows, walls, and a roof.
+def mcMansion():
+  height = 200
+  width = 200
+  picture = makeEmptyPicture(width, height, white)
+  #walls
+  addRect(picture, 39, 79, 120, 120, black)
+  #door
+  addRect(picture, 84, 139, 30, 60, darkGray)
+  addOvalFilled(picture, 88, 165, 7, 7, darkGray)
+  #windows
+  addRect(picture, 49, 150, 25, 25, black)
+  addRect(picture, 124, 150, 25, 25, black)
+  #roof
+  addLine(picture, 99, 19, 19, 99, red)
+  addLine(picture, 100, 19, 180, 99, red)
+  #And behold, the ugliest house for this study period.
+  explore(picture)
+  return picture
+
+
+#Q 5.17: Draw horizontal and vertical lines on a picture with 10 pixels between the lines.
+def testGridOverlay():
+  file = pickAFile()
+  picture = makePicture(file)
+  colour = pink
+  gridOverlay(picture, colour, 10)
+  explore(picture)
+
+def gridOverlay(picture, colour, scale):
+  width = getWidth(picture)
+  height = getHeight(picture)
+  #horizontal lines
+  x = 0
+  while x < width:
+    y = 0
+    while y < height:
+      pixel = getPixel(picture, x, y)
+      setColor(pixel, colour)
+      y = y + 1
+    x =  x + scale
+  #vertical lines
+  x = 0
+  while x < width:
+    y = 0
+    while y < height:
+      pixel = getPixel(picture, x, y)
+      setColor(pixel, colour)
+      y = y + scale
+    x =  x + 1
+
+
+#5.21 Draw a house on the beach where we put the mysterious box previously.
+
+def beachHut():
+  #tested this with "beach.jpg"
+  beach = makePicture(pickAFile())
+  explore(beach)
+  addRectFilled(beach, 230, 275, 90, 80, white)
+  #door
+  addRect(beach, 260, 295, 30, 60, darkGray)
+  addOvalFilled(beach, 265, 315, 7, 7, darkGray)
+  #windows
+  addRect(beach, 235, 300, 20, 20, black)
+  addRect(beach, 295, 300, 20, 20, black)
+  #roof
+  row = 0
+  y = 220
+  while y < 275:
+    x = 275 - row
+    while x <= 275 + row:
+      pixel = getPixel(beach, x, y)
+      setColor(pixel, red)
+      x = x + 1
+    y = y + 1
+    row = row + 1
+  explore(beach)
+
+
+#5.22 Write a function to draw a simple face with eyes and a mouth.
+
+def smiley():
+  size = 100
+  face = makeEmptyPicture(size, size, white)
+  #Skin & lip colours taken from http://www.erdemyilmaz.com.tr/wp-content/uploads/Pantone_SkinTones.htm
+  skin = makeColor(255, 223, 196)
+  addOvalFilled(face, 10, 0, 80, 100, skin)
+
+  #Mouth
+  lips = makeColor(113, 1, 1)
+  addArcFilled(face, 30, 55, 40, 25, 180, 180, lips)
+
+  #Hair
+  addArcFilled(face, 20, 0, 60, 30, 0, 180, darkGray)
+
+  #Eyes
+  #Eye colour taken from http://www.colorhexa.com/a1caf1
+  pupils = makeColor(63, 79, 95)
+  addOvalFilled(face, 25, 30, 20, 15, white)
+  addOvalFilled(face, 30, 32, 10, 10, pupils)
+  addOval(face, 25, 30, 20, 15, black)
+  addOvalFilled(face, 55, 30, 20, 15, white)
+  addOvalFilled(face, 60, 32, 10, 10, pupils)
+  addOval(face, 55, 30, 20, 15, black)
+
+  #Nose
+  addLine(face, 49, 44, 40, 59, black)
+  addLine(face, 40, 59, 55, 57, black)
+  explore(face)
+
+
+#5.24 Get some green posterboard and take a picture of a friend in front of it. Now use chromakey to put her or him in the jungle or in Paris.
+def testGreenScreen():
+  #tested this with "jenny2-green-small.jpg"
+  fg = makePicture(pickAFile())
+  #tested this with "jungle.jpg"
+  bg = makePicture(pickAFile())
+  explore(fg)
+  explore(bg)
+  greenScreen(fg, bg)
+  explore(fg)
+
+def greenScreen(fg, bg):
+  width = getWidth(fg)
+  height = getHeight(fg)
+  x = 0
+  while x < width:
+    y = 0
+    while y < height:
+      pixel = getPixel(fg, x, y)
+      r = getRed(pixel)
+      g = getGreen(pixel)
+      b = getBlue(pixel)
+      if g > r and g > b:
+        setColor(pixel, getColor(getPixel(bg, x, y)))
+      y = y + 1
+    x = x + 1
+
+
+#5.26 Draw a rainbow - use what you know about colours, pixels and drawing operations to draw a rainbow. Is this easier to do with our drawing functions or by manipulating individual pixels? Why?
+def makeRainbow():
+  rainbow = makeEmptyPicture(200, 100, cyan)
+  addArcFilled(rainbow, 0, 0, 200, 200, 0, 180, red)
+  #Colour taken from https://en.wikipedia.org/wiki/Orange_(colour)
+  o = makeColor(255, 127, 0)
+  addArcFilled(rainbow, 10, 10, 180, 180, 0, 180, o)
+  addArcFilled(rainbow, 20, 20, 160, 160, 0, 180, yellow)
+  addArcFilled(rainbow, 30, 30, 140, 140, 0, 180, green)
+  addArcFilled(rainbow, 40, 40, 120, 120, 0, 180, blue)
+  #Colour taken from https://en.wikipedia.org/wiki/Indigo
+  i = makeColor(75, 0, 130)
+  addArcFilled(rainbow, 50, 50, 100, 100, 0, 180, i)
+  #Colour taken from https://en.wikipedia.org/wiki/Violet_(color)
+  v = makeColor(127, 0, 255)
+  addArcFilled(rainbow, 60, 60, 80, 80, 0, 180, v)
+  addArcFilled(rainbow, 70, 70, 60, 60, 0, 180, cyan)
+  explore(rainbow)
