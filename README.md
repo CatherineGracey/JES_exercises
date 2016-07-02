@@ -1,0 +1,1 @@
+This repository is a collection of answers to end-of-chapter questions in Introduction to Computing and Programming in Python by Guzdial and Ericson. It also includes answers to additional questions posed in tutorials.
